@@ -8,8 +8,17 @@ public class DB : MonoBehaviour {
     string host = "127.0.0.1";
     enum MODE {LOGIN, INSERT, DELETE};
     MODE mode;
+    public Text username;
     public InputField nameField;
     public InputField passwordField;
+    public GameObject startFields;
+    public GameObject inputFields;
+    public Button stRegistButton;
+    public Button stLoginButton;
+    public Button stPlayButton;
+    public Button registButton;
+    public Button loginButton;
+    
     
     string sql;
     string result;
@@ -17,7 +26,43 @@ public class DB : MonoBehaviour {
     {
         
     }
-
+    private void Update()
+    {
+        if (DBManager.loggedIn)
+        {
+            username.text = "Player : " + DBManager.username;
+        }
+        stRegistButton.interactable = !DBManager.loggedIn;
+        stLoginButton.interactable = !DBManager.loggedIn;
+        stPlayButton.interactable = DBManager.loggedIn;
+    }
+    public void OnInputRegistField()
+    {
+        startFields.SetActive(false);
+        inputFields.SetActive(true);
+        registButton.gameObject.SetActive(true);
+        loginButton.gameObject.SetActive(false);
+        nameField.ActivateInputField();
+    }
+    public void OnInputLoginField()
+    {
+        startFields.SetActive(false);
+        inputFields.SetActive(true);
+        registButton.gameObject.SetActive(false);
+        loginButton.gameObject.SetActive(true);
+        nameField.ActivateInputField();
+    }
+    public void CancleButton()
+    {
+        nameField.text = "";
+        passwordField.text = "";
+        startFields.SetActive(true);
+        inputFields.SetActive(false);
+    }
+    public void Play()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(1);
+    }
     public void Register()
     {
         mode = MODE.INSERT;
@@ -59,7 +104,8 @@ public class DB : MonoBehaviour {
                 if(mode == MODE.LOGIN)
                 {
                     DBManager.username = nameField.text;
-                    UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+                    startFields.SetActive(true);
+                    inputFields.SetActive(false);
                 }
             }
             else
@@ -83,4 +129,15 @@ public class DB : MonoBehaviour {
     {
         return string.Format("DELETE * FROM {0} WHERE {1}", table, culums);
     }
+    public void VertifyInputs()
+    {
+        if (registButton.gameObject.activeInHierarchy)
+        {
+            registButton.interactable = (nameField.text.Length >= 6 && passwordField.text.Length >= 8);
+        }
+        else
+        {
+            loginButton.interactable = (nameField.text.Length >= 6 && passwordField.text.Length >= 8);
+        }
+    }    
 }
