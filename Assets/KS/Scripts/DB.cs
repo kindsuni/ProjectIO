@@ -98,15 +98,20 @@ public class DB : MonoBehaviour {
         if (www.isDone)
         {
             result = www.text.Trim();
-            if (result =="0")
+            
+            Debug.Log(www.text.Split('\t')[1]);
+            if(mode == MODE.LOGIN)
             {
-                Debug.Log(result);
-                if(mode == MODE.LOGIN)
+                if(result[0] == '0')
                 {
                     DBManager.username = nameField.text;
                     startFields.SetActive(true);
                     inputFields.SetActive(false);
                 }
+            }
+            else if (result =="0")
+            {
+                Debug.Log(result);
             }
             else
             {
