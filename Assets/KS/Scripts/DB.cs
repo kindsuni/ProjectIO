@@ -142,6 +142,8 @@ public class DB : MonoBehaviour {
                             DBManager.maxscore = int.Parse(result.Split('\t')[1]);
                             startFields.SetActive(true);
                             inputFields.SetActive(false);
+                            nameField.text = "";
+                            passwordField.text = "";
                         }
                     }
                     break;                
@@ -152,6 +154,8 @@ public class DB : MonoBehaviour {
                             //Debug.Log(result);
                             startFields.SetActive(true);
                             inputFields.SetActive(false);
+                            nameField.text = "";
+                            passwordField.text = "";
                         }
                         else
                         {
@@ -195,11 +199,11 @@ public class DB : MonoBehaviour {
     {
         if (registButton.gameObject.activeInHierarchy)
         {
-            registButton.interactable = (nameField.text.Length >= 6 && passwordField.text.Length >= 8);
+            registButton.interactable = (nameField.text.Length >= 4 && passwordField.text.Length >= 4);
         }
         else
         {
-            loginButton.interactable = (nameField.text.Length >= 6 && passwordField.text.Length >= 8);
+            loginButton.interactable = (nameField.text.Length >= 4 && passwordField.text.Length >= 4);
         }
     }
 }
