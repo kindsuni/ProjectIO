@@ -72,7 +72,7 @@ public class DB : MonoBehaviour {
         inputFields.SetActive(true);
         registButton.gameObject.SetActive(false);
         loginButton.gameObject.SetActive(true);
-        nameField.ActivateInputField();
+        nameField.ActivateInputField();        
     }
     public void CancleButton()
     {
@@ -95,7 +95,7 @@ public class DB : MonoBehaviour {
     {
         mode = MODE.DELETE;
         sql = SelectQuery("players", string.Format("username = '{0}'", nameField.text));
-        StartCoroutine(DBR(mode,sql));
+        StartCoroutine(DBR(mode,sql));        
         //Debug.Log(result);
     }
 
