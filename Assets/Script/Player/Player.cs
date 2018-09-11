@@ -70,6 +70,7 @@ public class Player : MonoBehaviour
             if (m_nEat > cFoodManager.m_nEat) //먹을 수 있다면.
             {
                 m_fExp += cFoodManager.m_fExp;
+                DBManager.score +=(int)cFoodManager.m_fExp;
                 cFoodManager.m_bEat = true;
                 m_txtSeeExp.text = "+" + cFoodManager.m_fExp +"Exp";
                 m_txtSeeExp.gameObject.SetActive(true);

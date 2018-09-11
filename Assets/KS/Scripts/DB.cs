@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class DB : MonoBehaviour {
 
     string host = "127.0.0.1";
-    enum MODE {LOGIN, INSERT, DELETE};
+    enum MODE {LOGIN, INSERT, DELETE, SAVE};
     MODE mode;
     public Text username;
     public InputField nameField;
@@ -28,13 +28,35 @@ public class DB : MonoBehaviour {
     }
     private void Update()
     {
-        if (DBManager.loggedIn)
+        if (DBManager.loggedIn && username != null)
         {
             username.text = "Player : " + DBManager.username;
         }
-        stRegistButton.interactable = !DBManager.loggedIn;
-        stLoginButton.interactable = !DBManager.loggedIn;
-        stPlayButton.interactable = DBManager.loggedIn;
+        if(stRegistButton != null)
+        {
+            stRegistButton.interactable = !DBManager.loggedIn;
+            stLoginButton.interactable = !DBManager.loggedIn;
+            stPlayButton.interactable = DBManager.loggedIn;
+            Enter();
+        }        
+    }
+    void Enter()
+    {
+        if (registButton.gameObject.activeInHierarchy)
+        {
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            {
+                Register();
+            }
+        }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            {
+                Login();
+            }
+        }
+
     }
     public void OnInputRegistField()
     {
@@ -84,6 +106,17 @@ public class DB : MonoBehaviour {
         StartCoroutine(DBR(mode, sql));
        //Debug.Log(result);
     }
+    public void Save()
+    {
+        if(DBManager.maxscore < DBManager.score)
+        {
+            mode = MODE.SAVE;
+            sql = SelectQuery("players", string.Format("username = '{0}'",DBManager.username));
+            StartCoroutine(SaveData(mode, sql));
+        }
+        return;
+       //Debug.Log(result);
+    }
 
     IEnumerator DBR(MODE _mode, string _sql)
     {
@@ -92,34 +125,58 @@ public class DB : MonoBehaviour {
         form.AddField("sql", _sql);        
         form.AddField("name", nameField.text);
         form.AddField("password", passwordField.text);
+        form.AddField("score", DBManager.score);
         //WWW www = new WWW(string.Format("http://{0}/testing.php",host),form);        
-        WWW www = new WWW("http://127.0.0.1/testing.php", form);        
+        WWW www = new WWW("http://192.168.0.33/testing.php", form);        
         yield return www;        
         if (www.isDone)
         {
             result = www.text.Trim();
-            
-            Debug.Log(www.text.Split('\t')[1]);
-            if(mode == MODE.LOGIN)
+            switch (mode)
             {
-                if(result[0] == '0')
-                {
-                    DBManager.username = nameField.text;
-                    startFields.SetActive(true);
-                    inputFields.SetActive(false);
-                }
-            }
-            else if (result =="0")
-            {
-                Debug.Log(result);
-            }
-            else
-            {
-                Debug.Log(result);
-            }
+                case MODE.LOGIN:
+                    {
+                        if (result[0] == '0')
+                        {
+                            DBManager.username = nameField.text;
+                            DBManager.maxscore = int.Parse(result.Split('\t')[1]);
+                            startFields.SetActive(true);
+                            inputFields.SetActive(false);
+                        }
+                    }
+                    break;                
+                default:
+                    {
+                        if (result == "0")
+                        {
+                            //Debug.Log(result);
+                            startFields.SetActive(true);
+                            inputFields.SetActive(false);
+                        }
+                        else
+                        {
+                            Debug.Log(result);
+                        }
+                    }
+                    break;
+                
+            }            //Debug.Log(www.text.Split('\t')[1]);
+            //Debug.Log(result);                        
         }
     }
 
+    IEnumerator SaveData(MODE _mode, string _sql)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("mode", string.Format("{0}", (int)_mode));
+        form.AddField("sql", _sql);
+        form.AddField("name", DBManager.username);
+        form.AddField("password", "0");
+        form.AddField("score", DBManager.score);
+        //WWW www = new WWW(string.Format("http://{0}/testing.php",host),form);        
+        WWW www = new WWW("http://127.0.0.1/testing.php", form);
+        yield return www;
+    }
     string SelectQuery(string table, string where)
     {
         //SELECT* FROM players WHERE username = '".$username."'";
@@ -144,5 +201,5 @@ public class DB : MonoBehaviour {
         {
             loginButton.interactable = (nameField.text.Length >= 6 && passwordField.text.Length >= 8);
         }
-    }    
+    }
 }

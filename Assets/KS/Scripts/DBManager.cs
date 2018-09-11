@@ -14,5 +14,5 @@ public static class DBManager {
     public static void logOut()
     {
         username = null;
-    }
+    }    
 }
